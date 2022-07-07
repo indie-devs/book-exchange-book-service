@@ -1,18 +1,30 @@
-#### Connect to Database
+## Install
 
-Paste your `DATABASE_URL` variable in `.env.development`
-`DATABASE_URL="postgresql://user:pass@localhost:5432/books?schema=public"`
+- Postgres
+- Nestjs CLI
 
-#### DB Migrate
+## Run the application
 
-Run this command an set your migrate name
+- Create `.env.development` in root directory. Set your `PORT` variable
+- Paste your database URL to `DATABASE_URL` in `.env.development` file `DATABASE_URL="postgresql://<user>:<pass>@localhost:5432/books?schema=public"`
+- Run `npm i` to install all dependencies.
+- Edit your model change in `schema.prisma` file and run `npm run prisma:generate "<migrate name>"`. Artifacts like Prisma Client also be generated.
+- Finally run `npm run start:dev`.
 
-`npm run prisma:generate`
+## Available Scripts
 
-#### Generate artifacts (e.g. Prisma Client)
+### `npm run prisma:generate "<migrate name>"`
 
-`npm run prisma:client`
+Sync prisma schema to database schema. Make schema change in `schema.prisma` file and run this command.
 
-#### Prisma Studio
+### `npm run prisma:client`
 
-`npm run prisma:studio`
+Generate artifacts (e.g. Prisma Client)
+
+### `npm run prisma:deploy`
+
+Applies all pending migrations.
+
+### `npm run prisma:pull`
+
+Adds Prisma models to Prisma schema that reflect the current database schema.
