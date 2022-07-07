@@ -6,7 +6,7 @@
 
 - Create `.env.development` in root directory. Set your `PORT` variable
 - Paste your database URL to `DATABASE_URL` in `.env.development` file `DATABASE_URL="postgresql://<user>:<pass>@localhost:5432/books?schema=public"`
-- Run `docker compose up -d`
+- Run `start:db` to start Postgres
 - Run `yarn i` to install all dependencies.
 - Run `yarn prisma:client` to generate Prisma Artifacts.
 - Finally run `yarn start:dev`.
