@@ -1,13 +1,12 @@
 ## Install
 
-- Require NodeJS version v16 and yarn v1
+- Require NodeJS v16 and yarn v1
 
 ## Run the application
 
-- Create `.env.development` in root directory. Set your `PORT` variable
-- Paste your database URL to `DATABASE_URL` in `.env.development` file `DATABASE_URL="postgresql://<user>:<pass>@localhost:5432/books?schema=public"`
+- Create `.env.development` in root directory adn define all variable listed in `.env.example`
 - Run `start:db` to start Postgres
-- Run `yarn i` to install all dependencies.
+- Run `yarn` to install all dependencies.
 - Run `yarn prisma:client` to generate Prisma Artifacts.
 - Finally run `yarn start:dev`.
 
