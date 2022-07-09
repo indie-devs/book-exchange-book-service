@@ -45,11 +45,11 @@ model Author {
 }
 
 model Category {
-  id         Int      @id @default(autoincrement())
-  name       String   @unique
-  decription String?
-  coverImage String?
-  createAt   DateTime @default(now())
-  updateAt   DateTime @updatedAt
-  isDisable  Boolean  @default(false)
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  coverImage  String?
+  createAt    DateTime @default(now())
+  updateAt    DateTime @updatedAt
+  isActive    Boolean  @default(true)
 }

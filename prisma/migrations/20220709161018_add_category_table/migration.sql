@@ -2,11 +2,11 @@
 CREATE TABLE "Category" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "decription" TEXT,
+    "description" TEXT,
     "coverImage" TEXT,
     "createAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" TIMESTAMP(3) NOT NULL,
-    "isDisable" BOOLEAN NOT NULL DEFAULT false,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
 );

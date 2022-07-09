@@ -3,66 +3,65 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/service';
+import { categoryDTO } from './dtos';
 
 @Injectable()
 export class CategoryService {
   constructor(private readonly prisma: PrismaService) {}
-  async createCategory(dto: Prisma.CategoryCreateInput) {
+  async createCategory(dto: categoryDTO) {
     try {
-      const category = await this.prisma.category.create({ data: dto });
-      return category;
+      return await this.prisma.category.create({ data: dto });
     } catch (error) {
       throw new BadRequestException(error);
     }
   }
-  async updateCategory(id: number, dto: Prisma.CategoryUpdateInput) {
+
+  async updateCategory(id: number, dto: categoryDTO) {
     try {
-      const category = await this.prisma.category.update({
+      return await this.prisma.category.update({
         where: {
-          id: +id,
+          id,
         },
         data: { ...dto },
       });
-      return category;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
-  async toggleCategory(id: number, isDisable: boolean) {
+
+  async toggleCategory(id: number, isActive: boolean) {
     try {
-      const category = await this.prisma.category.update({
-        where: { id: +id },
+      return await this.prisma.category.update({
+        where: { id },
         data: {
-          isDisable,
+          isActive,
         },
       });
-      return category;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
-  async delete(id: number) {
+
+  async deleteCategory(id: number) {
     try {
-      await this.prisma.category.delete({
-        where: { id: +id },
+      return await this.prisma.category.delete({
+        where: { id },
       });
-      return true;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
+
   async findCategory(id: number) {
-    const category = await this.prisma.category.findFirst({
-      where: { id: +id, isDisable: false },
+    return await this.prisma.category.findFirst({
+      where: { id, isActive: true },
     });
-    return category;
   }
+
   async findCategories() {
-    const categories = await this.prisma.category.findMany({
-      where: { isDisable: false },
+    return await this.prisma.category.findMany({
+      where: { isActive: true },
     });
-    return categories;
   }
 }
