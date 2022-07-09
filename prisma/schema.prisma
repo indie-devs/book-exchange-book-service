@@ -43,3 +43,13 @@ model Author {
   authorAvatar String?
   books        Book[]
 }
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  coverImage  String?
+  createAt    DateTime @default(now())
+  updateAt    DateTime @updatedAt
+  isActive    Boolean  @default(true)
+}
