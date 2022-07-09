@@ -6,3 +6,40 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum BookStatus {
+  NEW
+  VERIFIED
+  BANNED
+  DISABLED
+  PUBLISHED
+}
+
+model Book {
+  id                       Int        @id @default(autoincrement())
+  status                   BookStatus @default(NEW)
+  createdAt                DateTime   @default(now())
+  updatedAt                DateTime   @updatedAt
+  title                    String
+  isAvailableForExchanging Boolean    @default(true)
+  isDisabled               Boolean    @default(false)
+  description              String
+  numberOfPages            Int
+  coverImage               String
+  reprintTimes             Int
+  publishDate              DateTime
+  publisher                String
+  language                 String
+  authors                  Author[]
+}
+
+model Author {
+  id           Int       @id @default(autoincrement())
+  updatedAt    DateTime  @updatedAt
+  createdAt    DateTime  @default(now())
+  name         String
+  dob          DateTime?
+  bio          String?
+  authorAvatar String?
+  books        Book[]
+}
