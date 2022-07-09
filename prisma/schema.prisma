@@ -22,7 +22,7 @@ model Book {
   updatedAt                DateTime   @updatedAt
   title                    String
   isAvailableForExchanging Boolean    @default(true)
-  isDisabled               Boolean    @default(false)
+  isActive                 Boolean    @default(true)
   description              String
   numberOfPages            Int
   coverImage               String
@@ -31,6 +31,7 @@ model Book {
   publisher                String
   language                 String
   authors                  Author[]
+  categories               Category[]
 }
 
 model Author {
@@ -52,4 +53,5 @@ model Category {
   createAt    DateTime @default(now())
   updateAt    DateTime @updatedAt
   isActive    Boolean  @default(true)
+  books       Book[]
 }

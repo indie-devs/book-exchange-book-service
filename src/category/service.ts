@@ -65,4 +65,15 @@ export class CategoryService {
       where: { isActive: true },
     });
   }
+
+  async findBooksByCategory(categoryId: number) {
+    return await this.prisma.category.findFirst({
+      where: {
+        id: categoryId,
+      },
+      include: {
+        books: true,
+      },
+    });
+  }
 }
