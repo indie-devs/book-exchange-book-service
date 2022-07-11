@@ -3,13 +3,14 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { Category } from '@prisma/client';
 import { PrismaService } from 'src/prisma/service';
 import { categoryDTO } from './dtos';
 
 @Injectable()
 export class CategoryService {
   constructor(private readonly prisma: PrismaService) {}
-  async createCategory(dto: categoryDTO) {
+  async createCategory(dto: categoryDTO): Promise<Category> {
     try {
       return await this.prisma.category.create({ data: dto });
     } catch (error) {

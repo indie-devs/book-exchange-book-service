@@ -13,5 +13,5 @@ export class categoryDTO {
   updateAt?: Date;
 
   @IsBoolean()
-  isActive: boolean;
+  isActive?: boolean;
 }
