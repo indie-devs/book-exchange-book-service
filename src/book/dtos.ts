@@ -1,27 +1,24 @@
 import { BookStatus } from '@prisma/client';
-import { IsBoolean, IsNotEmpty } from 'class-validator';
-import { authorDTO } from 'src/author/dtos';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
-export class bookDTO {
-  id?: number;
+export class BookDTO {
   status?: BookStatus;
-  createdAt?: Date;
-  updatedAt?: Date;
 
   @IsNotEmpty()
   title: string;
 
-  @IsBoolean()
   isAvailableForExchanging?: boolean;
-  @IsBoolean()
-  isDisabled?: boolean;
+  isActive?: boolean;
 
   description: string;
+
+  @IsNumber()
   numberOfPages: number;
-  coverImage: string;
+  @IsNumber()
   reprintTimes: number;
+
+  coverImage: string;
   publishDate: Date | string;
   publisher: string;
   language: string;
-  authors?: authorDTO[];
 }

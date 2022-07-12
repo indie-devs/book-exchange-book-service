@@ -1,15 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/service';
-import { authorDTO } from './dtos';
+import { AuthorDTO } from './dtos';
 
 @Injectable()
 export class AuthorService {
   constructor(private readonly prisma: PrismaService) {}
-  async createAuthor(dto: authorDTO) {
+  async createAuthor(dto: AuthorDTO) {
     try {
       return await this.prisma.author.create({ data: dto });
     } catch (error) {
-      throw new BadRequestException(error);
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -22,5 +22,9 @@ export class AuthorService {
         books: true,
       },
     });
+  }
+
+  async findAll() {
+    return await this.prisma.author.findMany();
   }
 }

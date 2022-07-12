@@ -3,31 +3,30 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { Category } from '@prisma/client';
 import { PrismaService } from 'src/prisma/service';
-import { categoryDTO } from './dtos';
+import { CategoryDTO } from './dtos';
 
 @Injectable()
 export class CategoryService {
   constructor(private readonly prisma: PrismaService) {}
-  async createCategory(dto: categoryDTO): Promise<Category> {
+  async createCategory(dto: CategoryDTO) {
     try {
       return await this.prisma.category.create({ data: dto });
     } catch (error) {
-      throw new BadRequestException(error);
+      throw new BadRequestException(error.message);
     }
   }
 
-  async updateCategory(id: number, dto: categoryDTO) {
+  async updateCategory(id: number, dto: CategoryDTO) {
     try {
       return await this.prisma.category.update({
         where: {
           id,
         },
-        data: { ...dto },
+        data: dto,
       });
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -40,7 +39,7 @@ export class CategoryService {
         },
       });
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -50,30 +49,29 @@ export class CategoryService {
         where: { id },
       });
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
   async findCategory(id: number) {
     return await this.prisma.category.findFirst({
-      where: { id, isActive: true },
+      where: {
+        id,
+        isActive: true,
+      },
+      include: {
+        books: {
+          where: {
+            isActive: true,
+          },
+        },
+      },
     });
   }
 
   async findCategories() {
     return await this.prisma.category.findMany({
       where: { isActive: true },
-    });
-  }
-
-  async findBooksByCategory(categoryId: number) {
-    return await this.prisma.category.findFirst({
-      where: {
-        id: categoryId,
-      },
-      include: {
-        books: true,
-      },
     });
   }
 }

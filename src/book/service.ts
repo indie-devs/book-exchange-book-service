@@ -4,82 +4,73 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/service';
-import { bookDTO } from './dtos';
+import { BookDTO } from './dtos';
 
 @Injectable()
 export class BookService {
   constructor(private readonly prisma: PrismaService) {}
-  async createBook(bookDTO: bookDTO) {
+  async createBook(
+    dto: BookDTO,
+    authorId: number,
+    categories: { id: number }[],
+  ) {
     try {
+      const data = { ...dto };
+      if (authorId) {
+        data['author'] = {
+          connect: {
+            id: authorId,
+          },
+        };
+      }
+      if (Array.isArray(categories) && categories?.length > 0) {
+        data['categories'] = {
+          connect: categories,
+        };
+      }
       return await this.prisma.book.create({
-        data: bookDTO,
-      });
-    } catch (error) {
-      throw new BadRequestException(error);
-    }
-  }
-
-  async createBookByAuthor(bookDTO: bookDTO, authorId: number) {
-    try {
-      return await this.prisma.book.create({
-        data: {
-          ...bookDTO,
-          authors: {
-            connect: {
-              id: authorId,
-            },
-          },
-        },
+        data,
         include: {
-          authors: true,
-        },
-      });
-    } catch (error) {
-      throw new BadRequestException(error);
-    }
-  }
-
-  async updateBook(id: number, dto: bookDTO) {
-    try {
-      return await this.prisma.book.update({
-        where: { id },
-        data: dto,
-      });
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
-  }
-
-  async updateBookAuthors(id: number, authorId: { id: number }[]) {
-    try {
-      return await this.prisma.book.update({
-        where: { id },
-        data: {
-          authors: {
-            set: authorId,
-          },
-        },
-      });
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
-  }
-
-  async updateBookCategories(id: number, categories: { id: number }[]) {
-    try {
-      return await this.prisma.book.update({
-        where: { id },
-        data: {
-          categories: {
-            set: categories,
-          },
-        },
-        include: {
+          author: true,
           categories: true,
         },
       });
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      console.log(error.message);
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async updateBook(
+    id: number,
+    dto: BookDTO,
+    authorId?: number,
+    categories?: { id: number }[],
+  ) {
+    try {
+      const data = {
+        ...dto,
+        categories: {
+          set: categories,
+        },
+      };
+      if (authorId) {
+        data['author'] = {
+          connect: {
+            id: authorId,
+          },
+        };
+      }
+      return await this.prisma.book.update({
+        where: { id },
+        data,
+        include: {
+          author: true,
+          categories: true,
+        },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -92,7 +83,7 @@ export class BookService {
         },
       });
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -100,7 +91,7 @@ export class BookService {
     return await this.prisma.book.findFirst({
       where: { id, isActive: true },
       include: {
-        authors: true,
+        author: true,
         categories: true,
       },
     });
@@ -110,20 +101,8 @@ export class BookService {
     return await this.prisma.book.findMany({
       where: { isActive: true },
       include: {
-        authors: true,
+        author: true,
         categories: true,
-      },
-    });
-  }
-
-  async findCategoriesByBook(bookId: number) {
-    return await this.prisma.book.findMany({
-      where: {
-        id: bookId,
-      },
-      include: {
-        categories: true,
-        authors: true,
       },
     });
   }

@@ -30,7 +30,8 @@ model Book {
   publishDate              DateTime
   publisher                String
   language                 String
-  authors                  Author[]
+  author                   Author?    @relation(fields: [authorId], references: [id])
+  authorId                 Int?
   categories               Category[]
 }
 
@@ -42,7 +43,7 @@ model Author {
   dob          DateTime?
   bio          String?
   authorAvatar String?
-  books        Book[]
+  books         Book[]
 }
 
 model Category {
