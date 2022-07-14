@@ -1,17 +1,17 @@
 import { PrismaService } from 'src/prisma/service';
-import { CategoryService } from './service';
+import { CategoriesService } from './service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 
 describe('Category Service', () => {
-  let categoryService: CategoryService;
+  let categoryService: CategoriesService;
   let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [CategoryService, PrismaService],
+      providers: [CategoriesService, PrismaService],
     }).compile();
-    categoryService = module.get<CategoryService>(CategoryService);
+    categoryService = module.get<CategoriesService>(CategoriesService);
     prisma = module.get<PrismaService>(PrismaService);
   });
 

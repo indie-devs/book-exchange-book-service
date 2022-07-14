@@ -2,12 +2,14 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/service';
 import { BookDTO } from './dtos';
 
 @Injectable()
-export class BookService {
+export class BooksService {
+  private readonly logger: Logger = new Logger(BooksService.name);
   constructor(private readonly prisma: PrismaService) {}
   async createBook(
     dto: BookDTO,
@@ -36,7 +38,7 @@ export class BookService {
         },
       });
     } catch (error) {
-      console.log(error.message);
+      this.logger.error(error.message);
       throw new BadRequestException(error.message);
     }
   }
@@ -70,6 +72,7 @@ export class BookService {
         },
       });
     } catch (error) {
+      this.logger.error(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -83,6 +86,7 @@ export class BookService {
         },
       });
     } catch (error) {
+      this.logger.error(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }

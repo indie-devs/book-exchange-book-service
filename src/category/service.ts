@@ -2,17 +2,20 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/service';
 import { CategoryDTO } from './dtos';
 
 @Injectable()
-export class CategoryService {
+export class CategoriesService {
+  private readonly logger: Logger = new Logger(CategoriesService.name);
   constructor(private readonly prisma: PrismaService) {}
   async createCategory(dto: CategoryDTO) {
     try {
       return await this.prisma.category.create({ data: dto });
     } catch (error) {
+      this.logger.error(error.message);
       throw new BadRequestException(error.message);
     }
   }
@@ -26,6 +29,7 @@ export class CategoryService {
         data: dto,
       });
     } catch (error) {
+      this.logger.error(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -39,6 +43,7 @@ export class CategoryService {
         },
       });
     } catch (error) {
+      this.logger.error(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -49,6 +54,7 @@ export class CategoryService {
         where: { id },
       });
     } catch (error) {
+      this.logger.error(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }
