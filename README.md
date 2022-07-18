@@ -4,7 +4,7 @@
 
 ## Run the application
 
-- Create `.env.development` in root directory adn define all variable listed in `.env.example`
+- Create `.env.development` in root directory and define all variables listed in `.env.example`
 - Run `start:db` to start Postgres
 - Run `yarn` to install all dependencies.
 - Run `yarn prisma:client` to generate Prisma Artifacts.
