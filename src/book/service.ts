@@ -3,10 +3,12 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
-import { BookExchangeSession } from '@prisma/client';
+import { BookExchangeSession, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/service';
 import { BookDTO, BookLendDTO } from './dtos';
+import { BookExchangeBadRequestException, BookNotFoundException, BookUnknownException } from './exception';
 
 @Injectable()
 export class BooksService {
@@ -113,18 +115,35 @@ export class BooksService {
   }
 
   async requestToBorrowBook(requesterId: string, bookLendDto: BookLendDTO): Promise<BookExchangeSession> {
-    //TODO: check requester valid using User service and Auth service.
-    const { bookId, exchangeDate, dueDate } = bookLendDto;
-    //TODO: check book valid
-
-    //TODO: check book status
-
-    //TODO: create book exchange session
-
-    //TODO: update book status: isAvailableForExchanging
-
-    //TODO: return session
-
-    return null;
+    return await this.prisma.$transaction(async (prisma: Prisma.TransactionClient): Promise<BookExchangeSession> => {
+      const { bookId, exchangeDate, dueDate, note } = bookLendDto;
+      const book = await this.findBook(bookId);
+      if(!book) throw new BookNotFoundException(bookId)
+  
+      const newBookExchangeSession = await prisma.bookExchangeSession.create({
+        data: {
+          bookId,
+          exchangeDate,
+          dueDate,
+          requesterId,
+          note
+        }
+      });
+  
+      if (!newBookExchangeSession) throw new BookExchangeBadRequestException("CREATE");
+  
+      const updatedBook = await prisma.book.update({
+        where: {
+          id: bookId,
+        },
+        data: {
+          isAvailableForExchanging: false,
+        }
+      });
+  
+      if (updatedBook.isAvailableForExchanging) throw new BookUnknownException("UPDATE", "isAvailableForExchanging is not updated successfully.")
+  
+      return newBookExchangeSession;
+    });
   }
 }

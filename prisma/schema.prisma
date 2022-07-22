@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
@@ -43,8 +44,8 @@ model BookExchangeSession {
   exchangeDate              DateTime
   dueDate                   DateTime
   requesterId               String
-  note                      String
-  reviewId                  String
+  note                      String?
+  reviewId                  String?
   backwardExchangeSessionId String?              @unique
   backwardExchangeSession   BookExchangeSession? @relation("ExchangeCircularSession", fields: [backwardExchangeSessionId], references: [id])
   initialExchangeSession    BookExchangeSession? @relation("ExchangeCircularSession")

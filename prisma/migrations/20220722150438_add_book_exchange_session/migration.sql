@@ -5,8 +5,8 @@ CREATE TABLE "BookExchangeSession" (
     "exchangeDate" TIMESTAMP(3) NOT NULL,
     "dueDate" TIMESTAMP(3) NOT NULL,
     "requesterId" TEXT NOT NULL,
-    "note" TEXT NOT NULL,
-    "reviewId" TEXT NOT NULL,
+    "note" TEXT,
+    "reviewId" TEXT,
     "backwardExchangeSessionId" TEXT,
 
     CONSTRAINT "BookExchangeSession_pkey" PRIMARY KEY ("id")
