@@ -1,5 +1,5 @@
 import { BookStatus } from '@prisma/client';
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsDateString, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class BookDTO {
   status?: BookStatus;
@@ -21,4 +21,17 @@ export class BookDTO {
   publishDate: Date | string;
   publisher: string;
   language: string;
+}
+
+export class BookLendDTO {
+  @IsNotEmpty()
+  bookId: number;
+
+  @IsNotEmpty()
+  @IsDateString()
+  exchangeDate: string;
+
+  @IsNotEmpty()
+  @IsDateString()
+  dueDate: string;
 }

@@ -4,6 +4,7 @@ import { AuthorsModule } from './author/module';
 import { BooksModule } from './book/module';
 import { CategoriesModule } from './category/module';
 import { AppConfigService } from './config/appConfigService';
+import { ExternalModule } from './external/module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { AppConfigService } from './config/appConfigService';
     CategoriesModule,
     BooksModule,
     AuthorsModule,
+    ExternalModule
   ],
   providers: [ConfigService, AppConfigService],
 })

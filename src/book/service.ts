@@ -4,8 +4,9 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
+import { BookExchangeSession } from '@prisma/client';
 import { PrismaService } from 'src/prisma/service';
-import { BookDTO } from './dtos';
+import { BookDTO, BookLendDTO } from './dtos';
 
 @Injectable()
 export class BooksService {
@@ -77,7 +78,7 @@ export class BooksService {
     }
   }
 
-  async toggleBook(id: number, isActive: boolean) {
+  async toggleBookActivation(id: number, isActive: boolean) {
     try {
       return await this.prisma.book.update({
         where: { id },
@@ -109,5 +110,21 @@ export class BooksService {
         categories: true,
       },
     });
+  }
+
+  async requestToBorrowBook(requesterId: string, bookLendDto: BookLendDTO): Promise<BookExchangeSession> {
+    //TODO: check requester valid using User service and Auth service.
+    const { bookId, exchangeDate, dueDate } = bookLendDto;
+    //TODO: check book valid
+
+    //TODO: check book status
+
+    //TODO: create book exchange session
+
+    //TODO: update book status: isAvailableForExchanging
+
+    //TODO: return session
+
+    return null;
   }
 }

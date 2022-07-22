@@ -16,13 +16,13 @@ enum BookStatus {
 }
 
 model Book {
-  id                       Int        @id @default(autoincrement())
-  status                   BookStatus @default(NEW)
-  createdAt                DateTime   @default(now())
-  updatedAt                DateTime   @updatedAt
+  id                       Int                   @id @default(autoincrement())
+  status                   BookStatus            @default(NEW)
+  createdAt                DateTime              @default(now())
+  updatedAt                DateTime              @updatedAt
   title                    String
-  isAvailableForExchanging Boolean    @default(true)
-  isActive                 Boolean    @default(true)
+  isAvailableForExchanging Boolean               @default(true)
+  isActive                 Boolean               @default(true)
   description              String
   numberOfPages            Int
   coverImage               String
@@ -30,9 +30,24 @@ model Book {
   publishDate              DateTime
   publisher                String
   language                 String
-  author                   Author?    @relation(fields: [authorId], references: [id])
+  author                   Author?               @relation(fields: [authorId], references: [id])
   authorId                 Int?
   categories               Category[]
+  exchangeSessions         BookExchangeSession[]
+}
+
+model BookExchangeSession {
+  id                        String               @id @default(uuid())
+  bookId                    Int
+  book                      Book                 @relation(fields: [bookId], references: [id])
+  exchangeDate              DateTime
+  dueDate                   DateTime
+  requesterId               String
+  note                      String
+  reviewId                  String
+  backwardExchangeSessionId String?              @unique
+  backwardExchangeSession   BookExchangeSession? @relation("ExchangeCircularSession", fields: [backwardExchangeSessionId], references: [id])
+  initialExchangeSession    BookExchangeSession? @relation("ExchangeCircularSession")
 }
 
 model Author {
@@ -43,7 +58,7 @@ model Author {
   dob          DateTime?
   bio          String?
   authorAvatar String?
-  books         Book[]
+  books        Book[]
 }
 
 model Category {
