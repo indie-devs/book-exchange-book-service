@@ -1,0 +1,26 @@
+version: '2.1'
+
+services:
+  postgres:
+    env_file:
+      - .env
+    container_name: postgres_container
+    image: postgres
+    networks:
+      - prod
+    restart: unless-stopped
+  book-service:
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    container_name: book-service-prod
+    image: indiedevs/book-service-prod
+    ports:
+      - "3000:3000"
+    networks:
+      - prod
+    restart: on-failure
+networks:
+  prod:
+    driver: bridge
