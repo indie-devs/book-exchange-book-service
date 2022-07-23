@@ -23,6 +23,12 @@ services:
     networks:
       - postgres
     restart: unless-stopped
+  book-service-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/app
 
 networks:
   postgres:
