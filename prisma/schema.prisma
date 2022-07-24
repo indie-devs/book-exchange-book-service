@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["interactiveTransactions"]
 }
 
@@ -17,13 +17,14 @@ enum BookStatus {
 }
 
 model Book {
-  id                       Int                   @id @default(autoincrement())
+  id                       String                @id @default(uuid())
   status                   BookStatus            @default(NEW)
   createdAt                DateTime              @default(now())
   updatedAt                DateTime              @updatedAt
   title                    String
   isAvailableForExchanging Boolean               @default(true)
   isActive                 Boolean               @default(true)
+  ownerId                  String
   description              String
   numberOfPages            Int
   coverImage               String
@@ -32,27 +33,32 @@ model Book {
   publisher                String
   language                 String
   author                   Author?               @relation(fields: [authorId], references: [id])
-  authorId                 Int?
+  authorId                 String?
   categories               Category[]
   exchangeSessions         BookExchangeSession[]
 }
 
+enum BookExchangeSessionStatus {
+  INIT
+  ACCEPTED
+  DECLINED
+  DONE
+}
+
 model BookExchangeSession {
-  id                        String               @id @default(uuid())
-  bookId                    Int
-  book                      Book                 @relation(fields: [bookId], references: [id])
-  exchangeDate              DateTime
-  dueDate                   DateTime
-  requesterId               String
-  note                      String?
-  reviewId                  String?
-  backwardExchangeSessionId String?              @unique
-  backwardExchangeSession   BookExchangeSession? @relation("ExchangeCircularSession", fields: [backwardExchangeSessionId], references: [id])
-  initialExchangeSession    BookExchangeSession? @relation("ExchangeCircularSession")
+  id           String                    @id @default(uuid())
+  status       BookExchangeSessionStatus @default(INIT)
+  bookId       String
+  book         Book                      @relation(fields: [bookId], references: [id])
+  exchangeDate DateTime
+  dueDate      DateTime
+  requesterId  String
+  note         String?
+  reviewId     String?
 }
 
 model Author {
-  id           Int       @id @default(autoincrement())
+  id           String    @id @default(uuid())
   updatedAt    DateTime  @updatedAt
   createdAt    DateTime  @default(now())
   name         String
@@ -63,7 +69,7 @@ model Author {
 }
 
 model Category {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(uuid())
   name        String   @unique
   description String?
   coverImage  String?

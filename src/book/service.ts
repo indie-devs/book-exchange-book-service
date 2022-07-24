@@ -3,24 +3,24 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
-  NotFoundException,
 } from '@nestjs/common';
-import { BookExchangeSession, Prisma } from '@prisma/client';
+import { Book } from '@prisma/client';
 import { PrismaService } from 'src/prisma/service';
-import { BookDTO, BookLendDTO } from './dtos';
-import { BookExchangeBadRequestException, BookNotFoundException, BookUnknownException } from './exception';
+import { BookDTO } from './dtos';
+import { BookBadRequestException, BookForbiddenException, BookNotFoundException } from './exception';
 
 @Injectable()
 export class BooksService {
   private readonly logger: Logger = new Logger(BooksService.name);
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
   async createBook(
+    ownerId: string,
     dto: BookDTO,
-    authorId: number,
-    categories: { id: number }[],
+    authorId: string,
+    categories: { id: string }[],
   ) {
     try {
-      const data = { ...dto };
+      const data = { ...dto, ownerId };
       if (authorId) {
         data['author'] = {
           connect: {
@@ -47,10 +47,10 @@ export class BooksService {
   }
 
   async updateBook(
-    id: number,
+    id: string,
     dto: BookDTO,
-    authorId?: number,
-    categories?: { id: number }[],
+    authorId?: string,
+    categories?: { id: string }[],
   ) {
     try {
       const data = {
@@ -80,7 +80,7 @@ export class BooksService {
     }
   }
 
-  async toggleBookActivation(id: number, isActive: boolean) {
+  async toggleBookActivation(id: string, isActive: boolean) {
     try {
       return await this.prisma.book.update({
         where: { id },
@@ -94,7 +94,7 @@ export class BooksService {
     }
   }
 
-  async findBook(id: number) {
+  async findBook(id: string) {
     return await this.prisma.book.findFirst({
       where: { id, isActive: true },
       include: {
@@ -102,6 +102,12 @@ export class BooksService {
         categories: true,
       },
     });
+  }
+
+  async findAndCheckBookExistance(bookId: string) {
+    const book = await this.findBook(bookId);
+    if (!book) throw new BookNotFoundException(bookId);
+    return book;
   }
 
   async findBooks() {
@@ -114,36 +120,26 @@ export class BooksService {
     });
   }
 
-  async requestToBorrowBook(requesterId: string, bookLendDto: BookLendDTO): Promise<BookExchangeSession> {
-    return await this.prisma.$transaction(async (prisma: Prisma.TransactionClient): Promise<BookExchangeSession> => {
-      const { bookId, exchangeDate, dueDate, note } = bookLendDto;
-      const book = await this.findBook(bookId);
-      if(!book) throw new BookNotFoundException(bookId)
-  
-      const newBookExchangeSession = await prisma.bookExchangeSession.create({
-        data: {
-          bookId,
-          exchangeDate,
-          dueDate,
-          requesterId,
-          note
-        }
-      });
-  
-      if (!newBookExchangeSession) throw new BookExchangeBadRequestException("CREATE");
-  
-      const updatedBook = await prisma.book.update({
-        where: {
-          id: bookId,
-        },
-        data: {
-          isAvailableForExchanging: false,
-        }
-      });
-  
-      if (updatedBook.isAvailableForExchanging) throw new BookUnknownException("UPDATE", "isAvailableForExchanging is not updated successfully.")
-  
-      return newBookExchangeSession;
+  async verifyBookOwnerAction(ownerId: string, book: Book, action: string) {
+    if (ownerId !== book.ownerId) throw new BookForbiddenException(ownerId, book.id, action);
+    return true;
+  }
+
+  async setBookAvailability(userId: string, bookId: string, isAvailableForExchanging: boolean) {
+    const book = await this.findAndCheckBookExistance(bookId);
+    await this.verifyBookOwnerAction(userId, book, "UPDATE");
+
+    const updatedBook = await this.prisma.book.update({
+      where: {
+        id: book.id
+      },
+      data: {
+        isAvailableForExchanging
+      }
     });
+
+    if(!updatedBook) throw new BookBadRequestException("UPDATE");
+
+    return updatedBook;
   }
 }
