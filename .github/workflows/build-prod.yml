@@ -1,0 +1,22 @@
+name: 'CI'
+on:
+  push:
+    branches: [main]
+jobs:
+  build-prod:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/login-action@v2
+        with:
+          # username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          username: indiedevs
+          # password: ${{ secrets.DOCKER_HUB_TOKEN }}
+          password: 'c3a82913-3b96-4d76-8719-16815ea981ee'
+      - name: Build production
+        # run: docker image build -t ${{ secrets.DOCKER_HUB_USERNAME }}/book-service-prod:latest .
+        run: docker image build -t indiedevs/book-service-prod .
+      - name: Push to Docker Hub
+        # run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/book-service-prod:latest
+        run: docker push indiedevs/book-service-prod
