@@ -2,26 +2,10 @@ name: 'CI'
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 jobs:
-  build-for-lint-and-test:
-    runs-on: ubuntu-20.04
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build
-        # run: docker image build -f Dockerfile.dev -t ${{ secrets.DOCKER_HUB_USERNAME }}/book-service-testing .
-        run: docker image build -f Dockerfile.dev -t indiedevs/book-service-image-for-jest-testing .
-      - name: Lint
-        run: docker container run -e CI=true indiedevs/book-service-image-for-jest-testing yarn lint
-      - name: Test
-        # run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/book-service-prod
-        run: docker container run -e CI=true indiedevs/book-service-image-for-jest-testing yarn test
   build-prod:
     runs-on: ubuntu-20.04
     timeout-minutes: 15
-    needs: [build-for-lint-and-test]
     steps:
       - uses: actions/checkout@v2
       - uses: docker/login-action@v2
