@@ -20,7 +20,7 @@ export class CategoriesService {
     }
   }
 
-  async updateCategory(id: number, dto: CategoryDTO) {
+  async updateCategory(id: string, dto: CategoryDTO) {
     try {
       return await this.prisma.category.update({
         where: {
@@ -34,7 +34,7 @@ export class CategoriesService {
     }
   }
 
-  async toggleCategory(id: number, isActive: boolean) {
+  async toggleCategory(id: string, isActive: boolean) {
     try {
       return await this.prisma.category.update({
         where: { id },
@@ -48,7 +48,7 @@ export class CategoriesService {
     }
   }
 
-  async deleteCategory(id: number) {
+  async deleteCategory(id: string) {
     try {
       return await this.prisma.category.delete({
         where: { id },
@@ -59,7 +59,7 @@ export class CategoriesService {
     }
   }
 
-  async findCategory(id: number) {
+  async findCategory(id: string) {
     return await this.prisma.category.findFirst({
       where: {
         id,

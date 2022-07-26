@@ -4,5 +4,6 @@ import { BooksService } from './service';
 
 @Module({
   providers: [PrismaService, BooksService],
+  exports: [BooksService]
 })
 export class BooksModule {}

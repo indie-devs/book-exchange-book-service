@@ -15,7 +15,7 @@ export class AuthorsService {
     }
   }
 
-  async findBooksByAuthor(authorId: number) {
+  async findBooksByAuthor(authorId: string) {
     return await this.prisma.author.findFirst({
       where: {
         id: authorId,

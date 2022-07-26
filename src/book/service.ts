@@ -4,20 +4,23 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
+import { Book } from '@prisma/client';
 import { PrismaService } from 'src/prisma/service';
 import { BookDTO } from './dtos';
+import { BookBadRequestException, BookForbiddenException, BookNotFoundException } from './exception';
 
 @Injectable()
 export class BooksService {
   private readonly logger: Logger = new Logger(BooksService.name);
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
   async createBook(
+    ownerId: string,
     dto: BookDTO,
-    authorId: number,
-    categories: { id: number }[],
+    authorId: string,
+    categories: { id: string }[],
   ) {
     try {
-      const data = { ...dto };
+      const data = { ...dto, ownerId };
       if (authorId) {
         data['author'] = {
           connect: {
@@ -44,10 +47,10 @@ export class BooksService {
   }
 
   async updateBook(
-    id: number,
+    id: string,
     dto: BookDTO,
-    authorId?: number,
-    categories?: { id: number }[],
+    authorId?: string,
+    categories?: { id: string }[],
   ) {
     try {
       const data = {
@@ -77,7 +80,7 @@ export class BooksService {
     }
   }
 
-  async toggleBook(id: number, isActive: boolean) {
+  async toggleBookActivation(id: string, isActive: boolean) {
     try {
       return await this.prisma.book.update({
         where: { id },
@@ -91,7 +94,7 @@ export class BooksService {
     }
   }
 
-  async findBook(id: number) {
+  async findBook(id: string) {
     return await this.prisma.book.findFirst({
       where: { id, isActive: true },
       include: {
@@ -99,6 +102,12 @@ export class BooksService {
         categories: true,
       },
     });
+  }
+
+  async findAndCheckBookExistance(bookId: string) {
+    const book = await this.findBook(bookId);
+    if (!book) throw new BookNotFoundException(bookId);
+    return book;
   }
 
   async findBooks() {
@@ -109,5 +118,28 @@ export class BooksService {
         categories: true,
       },
     });
+  }
+
+  async verifyBookOwnerAction(ownerId: string, book: Book, action: string) {
+    if (ownerId !== book.ownerId) throw new BookForbiddenException(ownerId, book.id, action);
+    return true;
+  }
+
+  async setBookAvailability(userId: string, bookId: string, isAvailableForExchanging: boolean) {
+    const book = await this.findAndCheckBookExistance(bookId);
+    await this.verifyBookOwnerAction(userId, book, "UPDATE");
+
+    const updatedBook = await this.prisma.book.update({
+      where: {
+        id: book.id
+      },
+      data: {
+        isAvailableForExchanging
+      }
+    });
+
+    if(!updatedBook) throw new BookBadRequestException("UPDATE");
+
+    return updatedBook;
   }
 }
