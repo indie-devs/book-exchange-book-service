@@ -22,4 +22,3 @@ export class BookDTO {
   publisher: string;
   language: string;
 }
-

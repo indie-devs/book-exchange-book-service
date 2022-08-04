@@ -1,7 +1,7 @@
-import { BadRequestException, NotFoundException } from "@nestjs/common";
+import { BadRequestException } from '@nestjs/common';
 
 export class CustomBadRequestException extends BadRequestException {
-    constructor(action: string, type: string) {
-        super(`Bad request on ${action} with domain ${type}`);
-    }
+  constructor(action: string, type: string) {
+    super(`Bad request on ${action} with domain ${type}`);
+  }
 }

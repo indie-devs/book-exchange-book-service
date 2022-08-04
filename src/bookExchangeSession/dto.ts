@@ -1,17 +1,17 @@
-import { IsNotEmpty, IsDateString, IsString } from "class-validator";
+import { IsNotEmpty, IsDateString, IsString } from 'class-validator';
 
 export class BookBorrowDTO {
-    @IsNotEmpty()
-    bookId: string;
+  @IsNotEmpty()
+  bookId: string;
 
-    @IsNotEmpty()
-    @IsDateString()
-    exchangeDate: string;
+  @IsNotEmpty()
+  @IsDateString()
+  exchangeDate: string;
 
-    @IsNotEmpty()
-    @IsDateString()
-    dueDate: string;
+  @IsNotEmpty()
+  @IsDateString()
+  dueDate: string;
 
-    @IsString()
-    note: string;
+  @IsString()
+  note: string;
 }
