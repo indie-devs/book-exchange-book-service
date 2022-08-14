@@ -15,6 +15,7 @@
     "prisma:apply:migrate": "dotenv -e .env.development -- npx prisma migrate dev",
     "prisma:deploy": "dotenv -e .env -- npx prisma migrate deploy",
     "prisma:pull": "dotenv -e .env.development -- npx prisma db pull",
+    "prisma:seed": "dotenv -e .env.test -- npx prisma db seed",
     "start:db": "docker-compose -f docker-compose.development.yml up -d || docker compose -f docker-compose.development.yml up -d",
     "start:dev": "dotenv -e .env.development -- nest start --watch",
     "start:debug": "dotenv -e .env.development -- nest start --debug --watch",
@@ -25,7 +26,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "pretest:int": "dotenv -e .env.test -- npx prisma migrate reset --force",
+    "pretest:int": "dotenv -e .env.test -- npx prisma migrate reset --force && dotenv -e .env.test -- ts-node --transpile-only prisma/seed.ts",
     "test:int": "dotenv -e .env.test -- jest -i --no-cache --watch --config jest-int.json"
   },
   "dependencies": {

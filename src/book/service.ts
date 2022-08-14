@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -45,8 +44,7 @@ export class BooksService {
         },
       });
     } catch (error) {
-      this.logger.error(error.message);
-      throw new BadRequestException(error.message);
+      throw new BookBadRequestException('create');
     }
   }
 
@@ -59,17 +57,11 @@ export class BooksService {
     try {
       const data = {
         ...dto,
+        author: authorId ? { connect: { id: authorId } } : { disconnect: true },
         categories: {
-          set: categories,
+          set: categories || [],
         },
       };
-      if (authorId) {
-        data['author'] = {
-          connect: {
-            id: authorId,
-          },
-        };
-      }
       return await this.prisma.book.update({
         where: { id },
         data,
@@ -79,8 +71,7 @@ export class BooksService {
         },
       });
     } catch (error) {
-      this.logger.error(error.message);
-      throw new InternalServerErrorException(error.message);
+      throw new BookBadRequestException('update');
     }
   }
 
@@ -93,7 +84,6 @@ export class BooksService {
         },
       });
     } catch (error) {
-      this.logger.error(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }
