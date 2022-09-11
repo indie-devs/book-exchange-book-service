@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -7,12 +6,16 @@ import {
 import { Book } from '@prisma/client';
 import { PrismaService } from 'src/prisma/service';
 import { BookDTO } from './dtos';
-import { BookBadRequestException, BookForbiddenException, BookNotFoundException } from './exception';
+import {
+  BookBadRequestException,
+  BookForbiddenException,
+  BookNotFoundException,
+} from './exception';
 
 @Injectable()
 export class BooksService {
   private readonly logger: Logger = new Logger(BooksService.name);
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
   async createBook(
     ownerId: string,
     dto: BookDTO,
@@ -41,8 +44,7 @@ export class BooksService {
         },
       });
     } catch (error) {
-      this.logger.error(error.message);
-      throw new BadRequestException(error.message);
+      throw new BookBadRequestException('create');
     }
   }
 
@@ -55,17 +57,11 @@ export class BooksService {
     try {
       const data = {
         ...dto,
+        author: authorId ? { connect: { id: authorId } } : { disconnect: true },
         categories: {
-          set: categories,
+          set: categories || [],
         },
       };
-      if (authorId) {
-        data['author'] = {
-          connect: {
-            id: authorId,
-          },
-        };
-      }
       return await this.prisma.book.update({
         where: { id },
         data,
@@ -75,8 +71,7 @@ export class BooksService {
         },
       });
     } catch (error) {
-      this.logger.error(error.message);
-      throw new InternalServerErrorException(error.message);
+      throw new BookBadRequestException('update');
     }
   }
 
@@ -89,7 +84,6 @@ export class BooksService {
         },
       });
     } catch (error) {
-      this.logger.error(error.message);
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -121,24 +115,29 @@ export class BooksService {
   }
 
   async verifyBookOwnerAction(ownerId: string, book: Book, action: string) {
-    if (ownerId !== book.ownerId) throw new BookForbiddenException(ownerId, book.id, action);
+    if (ownerId !== book.ownerId)
+      throw new BookForbiddenException(ownerId, book.id, action);
     return true;
   }
 
-  async setBookAvailability(userId: string, bookId: string, isAvailableForExchanging: boolean) {
+  async setBookAvailability(
+    userId: string,
+    bookId: string,
+    isAvailableForExchanging: boolean,
+  ) {
     const book = await this.findAndCheckBookExistance(bookId);
-    await this.verifyBookOwnerAction(userId, book, "UPDATE");
+    await this.verifyBookOwnerAction(userId, book, 'UPDATE');
 
     const updatedBook = await this.prisma.book.update({
       where: {
-        id: book.id
+        id: book.id,
       },
       data: {
-        isAvailableForExchanging
-      }
+        isAvailableForExchanging,
+      },
     });
 
-    if(!updatedBook) throw new BookBadRequestException("UPDATE");
+    if (!updatedBook) throw new BookBadRequestException('UPDATE');
 
     return updatedBook;
   }

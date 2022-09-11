@@ -1,5 +1,6 @@
 import { BookStatus } from '@prisma/client';
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsNotEmpty, IsNumber, ValidateNested } from 'class-validator';
 
 export class BookDTO {
   status?: BookStatus;
@@ -23,3 +24,24 @@ export class BookDTO {
   language: string;
 }
 
+export class BookCreateDTO {
+  @IsNotEmpty()
+  ownerId?: string;
+
+  @ValidateNested()
+  @Type(() => BookDTO)
+  book?: BookDTO;
+  authorId?: string;
+  categoriesId?: { id: string }[];
+}
+
+export class BookUpdateDTO {
+  @IsNotEmpty()
+  id?: string;
+
+  @ValidateNested()
+  @Type(() => BookDTO)
+  book?: BookDTO;
+  authorId?: string;
+  categoriesId?: { id: string }[];
+}

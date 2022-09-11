@@ -6,4 +6,4 @@ import { BookExchangeSessionsService } from './service';
 @Module({
   providers: [PrismaService, BooksService, BookExchangeSessionsService],
 })
-export class BooksModule {}
+export class BooksExchangeSessionsModule {}

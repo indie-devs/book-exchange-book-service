@@ -12,4 +12,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       await app.close();
     });
   }
+
+  async cleanDatabase() {
+    if (process.env.NODE_ENV !== 'test') return;
+    const models = Reflect.ownKeys(this).filter((key) => key[0] !== '_');
+    return Promise.all(models.map((modelKey) => this[modelKey].deleteMany()));
+  }
 }
